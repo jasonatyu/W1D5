@@ -3,6 +3,8 @@ require "byebug"
 
 class KnightPathFinder
 
+    attr_reader :considered_positions, :root_node
+
     def initialize(pos)
         @root_node = PolyTreeNode.new(pos)
         @considered_positions = [pos]
@@ -28,33 +30,31 @@ class KnightPathFinder
 
     def new_move_positions(pos)
         possible_moves = self.class.valid_moves(pos)
-        possible_moves.reject { |move| @considered_positions.include?(move) }
+        new_moves = possible_moves.reject { |move| @considered_positions.include?(move) }
+        considered_positions.concat(new_moves)
+        new_moves
     end 
 
-    # def build_move_tree 
-    #     queue = [self.root_node]
-    #     current_node = queue.shift
-    #     new_positions = new_move_positions(current_node)
+    def build_move_tree 
+        queue = [root_node]
+        until queue.empty?
+            # debugger
+            current_node = queue.shift
+            new_positions = new_move_positions(current_node.value)
 
-    #     new_positions.each do |pos|
-    #         current_node.children << PolyTreeNode.new(pos)
-    #     end 
+            new_positions.each do |pos|
+                current_node.children << PolyTreeNode.new(pos)
+            end 
 
-    #     current_node.children.each do |child|
-    #         queue << child
-    #     end 
-    # end 
+            current_node.children.each do |child|
+                queue << child
+            end 
+        end
+        root_node
+    end 
 
     def find_path
 
     end 
-
-    private
-    attr_reader :considered_positions
+    
 end 
-
-# n = KnightPathFinder.new([3,4])
-# n.considered_positions << [3,3]
-# n.considered_positions << [4,4]
-
-# p n.new_move_positions([3,4])
